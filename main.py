@@ -25,7 +25,7 @@ def main(
     result = subprocess.run(["git status --porcelain=v1 | wc -l" ], shell=True, capture_output=True)
     changements_git = int(result.stdout.decode().strip())
     if changements_git == 0:
-        print("====No Changes=====")
+        print("[bold green]:white_check_mark: Pas de changement détectés ![/bold green]")
         quit()
 
 
@@ -35,7 +35,7 @@ def main(
     current_branch = subprocess.getoutput('git rev-parse --abbrev-ref HEAD')
     print(current_branch)
     if current_branch in ["master", "main"] and not master:
-        print("[bold red]:warning: Master detected ![/bold red]")
+        print("[bold yellow]:warning: Master detected ![/bold yellow]")
         new_branch = generateBranchNameAI(commit_message)
         print(f"=> Changement de branche : {new_branch}")
         subprocess.run([f"git checkout -b {new_branch}"], shell=True)
