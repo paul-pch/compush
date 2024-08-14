@@ -31,7 +31,7 @@ def main(
 
     # Vérifie que la branche n'est pas 'master' ou 'main'
     ## Génère une branche en fonction du commit message et se positionne dessus
-    print("\n[bold]:left_arrow_curving_right: Vérification de la branche ..[/bold]")
+    print("[bold]:left_arrow_curving_right: Vérification de la branche ..[/bold]")
     current_branch = subprocess.getoutput('git rev-parse --abbrev-ref HEAD')
     print(current_branch)
     if current_branch in ["master", "main"] and not master:
