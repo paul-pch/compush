@@ -53,23 +53,6 @@ def main(
 
 
 
-
-    # Merge Request Section
-    # if mr:
-    #     print(f"No provided users (raw input = {user})")
-    #     raise typer.Abort()
-    # for u in user:
-    #     print(f"Processing user: {u}")
-
-    # --title
-    # --description (default value)
-    # --label (optional)
-    # --task (optional)
-    # --test (optional)
-    # --env (optional)
-    # --notes
-
-
 def generateBranchNameAI(commit: str):
     directives = [
         f"Génère moi un nom de branch en fonction du nom de commit suivant : {commit} .",
@@ -92,8 +75,6 @@ def generateBranchNameAI(commit: str):
 
     return chat_response.choices[0].message.content
 
-# TODO
-# def generateCommitMessage(gitDiff: str):
 
 if __name__ == "__main__":
     typer.run(main)

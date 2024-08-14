@@ -1,4 +1,4 @@
-# COMPUSH
+# Compush
 
 `compush` est un petit utilitaire git pour me faire gagner du temps lors de mes développements.
 Son objectif est d'embarquer tout le code non commité localement et de le push sur une branche remote.
@@ -9,10 +9,10 @@ Son objectif est d'embarquer tout le code non commité localement et de le push 
 
 ```sh
     # Builder le binaire
-```
+    make
 
-```sh
-    # Ajouter le binaire au path
+    # Recharger le terminal
+    source ~/.zshrc
 ```
 
 ### Usage
