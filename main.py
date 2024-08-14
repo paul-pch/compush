@@ -36,10 +36,10 @@ def main(
     current_branch = subprocess.getoutput('git rev-parse --abbrev-ref HEAD')
     print(current_branch)
     if current_branch in ["master", "main"] and not master:
-        print("[bold yellow]:warning: Master detected ![/bold yellow]")
-
         new_branch = branch
         if not branch:
+            print("[bold yellow]:warning: Master detected ![/bold yellow]")
+            print("[bold]:left_arrow_curving_right: Génération d'une branche.. [/bold]")
             new_branch = generateBranchNameAI(commit_message)
 
         print(f"[bold]:left_arrow_curving_right: Changement de branche: {new_branch} [/bold]")
