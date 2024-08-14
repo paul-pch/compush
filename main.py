@@ -31,23 +31,24 @@ def main(
 
     # Vérifie que la branche n'est pas 'master' ou 'main'
     ## Génère une branche en fonction du commit message et se positionne dessus
-    print("====Check Branch=====")
+    print("[bold]:left_arrow_curving_right: Vérification de la branche ..[/bold]")
     current_branch = subprocess.getoutput('git rev-parse --abbrev-ref HEAD')
     print(current_branch)
     if current_branch in ["master", "main"] and not master:
         print("[bold yellow]:warning: Master detected ![/bold yellow]")
         new_branch = generateBranchNameAI(commit_message)
-        print(f"=> Changement de branche : {new_branch}")
+        print(f"[bold]:left_arrow_curving_right: Changement de branche: {new_branch} [/bold]")
         subprocess.run([f"git checkout -b {new_branch}"], shell=True)
         subprocess.run([f"git push -u origin {new_branch}"], shell=True)
 
 
     # Commit du code
-    print("====Push Code=====")
+    print("[bold]:left_arrow_curving_right: Commit/push ..[/bold]")
     subprocess.run(['git add .'], shell=True)
     subprocess.run([f"git commit -m \"{commit_message}\""], shell=True)
     subprocess.run(['git push'], shell=True)
 
+    print("[bold green]:white_check_mark: Code compushed ![/bold green]")
 
 
 
@@ -72,7 +73,8 @@ def generateBranchNameAI(commit: str):
     directives = [
         f"Génère moi un nom de branch en fonction du nom de commit suivant : {commit} .",
         "Je ne veux pas de / ou de - mais des _ à la place.",
-        "Renvoie moi uniquement le nom de la branche et rien d'autre."
+        "Renvoie moi uniquement le nom de la branche et rien d'autre.",
+        "Reformule légèrement, enlève les doublons et les connecteurs"
         ]
 
     requete = ' '.join(directives)
