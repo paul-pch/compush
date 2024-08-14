@@ -31,7 +31,7 @@ def main(
 
     # Vérifie que la branche n'est pas 'master' ou 'main'
     ## Génère une branche en fonction du commit message et se positionne dessus
-    print("[bold]:left_arrow_curving_right: Vérification de la branche ..[/bold]")
+    print("\n[bold]:left_arrow_curving_right: Vérification de la branche ..[/bold]")
     current_branch = subprocess.getoutput('git rev-parse --abbrev-ref HEAD')
     print(current_branch)
     if current_branch in ["master", "main"] and not master:
@@ -43,12 +43,13 @@ def main(
 
 
     # Commit du code
-    print("[bold]:left_arrow_curving_right: Commit/push ..[/bold]")
+    print("\n[bold]:left_arrow_curving_right: Commit/push ..[/bold]")
     subprocess.run(['git add .'], shell=True)
     subprocess.run([f"git commit -m \"{commit_message}\""], shell=True)
     subprocess.run(['git push'], shell=True)
 
-    print("[bold green]:white_check_mark: Code compushed ![/bold green]")
+
+    print("\n[bold green]:white_check_mark: Code compushed ![/bold green]")
 
 
 
