@@ -2,7 +2,7 @@
 all: install integrate
 
 install:
-	pyinstaller --onefile main.py
+	pyinstaller --onefile compush.py
 
 integrate:
 	grep -q '$(CURDIR)' ~/.zshrc || echo 'export PATH=$(CURDIR)/dist:$$PATH' >> ~/.zshrc

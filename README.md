@@ -18,18 +18,16 @@ Son objectif est d'embarquer tout le code non commité localement et de le push 
 ### Usage
 
 ```sh
-    # Exemple
-    compush "feat(): Ajout d'une nouvelle fonctionnalité"
-
+    # Helper
     compush --help
 ```
 
 ## Fonctionnalités
 
-* [ ] Avoir un readme plus correct ..
+* [x] Avoir un readme plus correct ..
 * [x] Commit/Push tout le code en cours avec un message de commit passé en paramètre
-* [x] Ne commit jamais sur `master` ou `main`
+* [x] Ne pas commit sur `master` ou `main`
 * [x] Génération automatique d'un nom de branche spécifique par AI (mistral) si la branche courante est `master` ou `main`.
-* [ ] Créer automatiquement une MR avec un jeu de paramètres dédiés
+* [ ] Créer automatiquement une MR gitlab avec un jeu de paramètres dédiés
 * [ ] Générer le message de commit par IA en fonction du git diff
 
