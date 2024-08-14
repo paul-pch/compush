@@ -18,6 +18,7 @@ client = Mistral(api_key=api_key)
 def main(
     commit_message: Annotated[str, typer.Argument(help="Message à intégrer au commit")],
     master: Annotated[Optional[bool], typer.Option(help="Permet de forcer le push sur master")] = False,
+    branch: Annotated[Optional[str], typer.Option(help="Permet de forcer un nom de branche git")] = None,
     mr: Annotated[Optional[List[str]], typer.Option(help="Déclenche la création d'une merge request sur gitlab")] = None
 ):
 
@@ -36,7 +37,11 @@ def main(
     print(current_branch)
     if current_branch in ["master", "main"] and not master:
         print("[bold yellow]:warning: Master detected ![/bold yellow]")
-        new_branch = generateBranchNameAI(commit_message)
+
+        new_branch = branch
+        if not branch:
+            new_branch = generateBranchNameAI(commit_message)
+
         print(f"[bold]:left_arrow_curving_right: Changement de branche: {new_branch} [/bold]")
         subprocess.run([f"git checkout -b {new_branch}"], shell=True)
         subprocess.run([f"git push -u origin {new_branch}"], shell=True)
