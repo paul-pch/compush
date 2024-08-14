@@ -15,7 +15,11 @@ client = Mistral(api_key=api_key)
 
 
 
-def main(commit_message: str, mr: Annotated[Optional[List[str]], typer.Option()] = None):
+def main(
+    commit_message: Annotated[str, typer.Argument(help="Message à intégrer au commit")],
+    master: Annotated[Optional[bool], typer.Option(help="Permet de forcer le push sur master")] = False,
+    mr: Annotated[Optional[List[str]], typer.Option(help="Déclenche la création d'une merge request sur gitlab")] = None
+):
 
     # Vérifie si des changements sont en attente
     result = subprocess.run(["git status --porcelain=v1 | wc -l" ], shell=True, capture_output=True)
@@ -30,7 +34,7 @@ def main(commit_message: str, mr: Annotated[Optional[List[str]], typer.Option()]
     print("====Check Branch=====")
     current_branch = subprocess.getoutput('git rev-parse --abbrev-ref HEAD')
     print(current_branch)
-    if current_branch in ["master", "main"]:
+    if current_branch in ["master", "main"] and not master:
         new_branch = generateBranchNameAI(commit_message)
         print(f"=> Changement de branche : {new_branch}")
         subprocess.run([f"git checkout -b {new_branch}"], shell=True)
@@ -40,7 +44,7 @@ def main(commit_message: str, mr: Annotated[Optional[List[str]], typer.Option()]
     # Commit du code
     print("====Push Code=====")
     subprocess.run(['git add .'], shell=True)
-    subprocess.run([f"git commit -m '{commit_message}'"], shell=True)
+    subprocess.run([f"git commit -m \"{commit_message}\""], shell=True)
     subprocess.run(['git push'], shell=True)
 
 
