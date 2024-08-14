@@ -35,6 +35,7 @@ def main(
     current_branch = subprocess.getoutput('git rev-parse --abbrev-ref HEAD')
     print(current_branch)
     if current_branch in ["master", "main"] and not master:
+        print("[bold red]:warning: Master detected ![/bold red]")
         new_branch = generateBranchNameAI(commit_message)
         print(f"=> Changement de branche : {new_branch}")
         subprocess.run([f"git checkout -b {new_branch}"], shell=True)

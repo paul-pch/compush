@@ -26,6 +26,7 @@ Son objectif est d'embarquer tout le code non commité localement et de le push 
 
 ## Fonctionnalités
 
+* [ ] Avoir un readme plus correct ..
 * [x] Commit/Push tout le code en cours avec un message de commit passé en paramètre
 * [x] Ne commit jamais sur `master` ou `main`
 * [x] Génération automatique d'un nom de branche spécifique par AI (mistral) si la branche courante est `master` ou `main`.
