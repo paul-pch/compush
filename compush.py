@@ -53,10 +53,13 @@ def main(
     print("\n[bold]:left_arrow_curving_right: Commit/push ..[/bold]")
     subprocess.run(['git add .'], shell=True)
     subprocess.run([f"git commit -m \"{commit_message}\""], shell=True)
-    subprocess.run(['git push'], shell=True)
-
-
-    print("\n[bold green]:white_check_mark: Code compushed ![/bold green]")
+    
+    push = subprocess.run(['git push'], shell=True)
+    if result.returncode == 0:
+        print("\n[bold green]:white_check_mark: Code compushed ![/bold green]")
+    else:
+        print("\n[bold red]:building_construction: Erreur - Problème lors du push du code ... [/bold green]")
+        quit(1)
 
 
 
