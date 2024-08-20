@@ -31,4 +31,6 @@ Son objectif est d'embarquer tout le code non commité localement et de le push 
 * [x] Créer automatiquement une MR gitlab avec un jeu de paramètres dédiés
 * [ ] Générer le message de commit par IA en fonction du git diff
 * [ ] Ajouter un mode offline
+* [ ] Rendre la création de MR interractive pour simplifier la commande
+* [ ] Ajouter une option pour push sur slack direct
 
