@@ -1,19 +1,21 @@
 """Compush CLI"""
 #!/usr/bin/python3
 
-from typing import Optional
+from typing import List, Optional
 
 import os
 import subprocess
 import sys
 import typer
-import json
 
 from mistralai import Mistral
 from rich import print
 from typing_extensions import Annotated
 
 import gitlab_utils
+import renderer
+import regex
+import json
 
 api_key = os.environ["MISTRAL_API_KEY"]
 model = "mistral-large-latest"
@@ -26,7 +28,13 @@ def main(
     branch: Annotated[Optional[str], typer.Option(help="Permet de forcer un nom de branche git (seulement si l'actuelle est master ou main)")] = None,
     mr: Annotated[Optional[bool], typer.Option(help="Déclenche la création d'une merge request sur gitlab")] = False,
     label: Annotated[Optional[str], typer.Option(help="Mode MR - Permet d'ajouter un label à la merge request")] = None,
-    description: Annotated[Optional[str], typer.Option(help="Mode MR - Permet d'ajouter une description à la merge request")] = None
+    time_review: Annotated[Optional[str], typer.Option(help="Mode MR - Permet d'ajouter un temps de relecture à la merge request")] = None,
+    description: Annotated[Optional[str], typer.Option(help="Mode MR - Permet d'ajouter un entête descriptif à la merge request")] = None,
+    task: Annotated[Optional[List[str]], typer.Option(help="Mode MR - Permet d'ajouter des tâches réalisées à la description de merge request")] = None,
+    env: Annotated[Optional[List[str]], typer.Option(help="Mode MR - Permet d'ajouter des environnements à la description de merge request")] = None,
+    test: Annotated[Optional[List[str]], typer.Option(help="Mode MR - Permet d'ajouter des tests à la description de merge request")] = None,
+    notes: Annotated[Optional[str], typer.Option(help="Mode MR - Permet d'ajouter des notes à la merge request")] = None
+
 ):
     """Fonction racine"""
 
@@ -35,7 +43,7 @@ def main(
 
     ## Merge Request
     if mr:
-        create_merge_request(commit_message, description, label)
+        create_merge_request(commit_message, description, time_review, label, task, env, test, notes)
 
 def commit_code(commit_message: str, master: bool, branch: str):
     """Méthode de commit et push du code courant"""
@@ -73,16 +81,25 @@ def commit_code(commit_message: str, master: bool, branch: str):
             print("\n[bold red]:building_construction: Erreur - Problème lors du push du code ... [/bold red]")
             sys.exit(1)
 
-def create_merge_request(commit_message: str, description: str, label: str):
+def create_merge_request(
+    commit_message: str,
+    description: str,
+    time_review: str,
+    label: str,
+    tasks: List[str],
+    envs: List[str],
+    tests: List[str],
+    notes: str
+    ):
     """Méthode de création de merge request avec les informations passées en paramètre"""
 
     print("\n[bold]:left_arrow_curving_right: Création merge request ..[/bold]")
 
     # Vérification des variables obligatoires
 
-    ## Description
-    if not description:
-        print("\n[bold yellow]:warning: Attention ! En mode MR, veuillez renseigner une description : --description \"une description\" [/bold yellow]")
+     ## Time_review
+    if not time_review:
+        print("\n[bold yellow]:warning: Attention ! En mode MR, veuillez renseigner un temps de relecture : --time_review \"2 mins\" [/bold yellow]")
         sys.exit(1)
 
     ## Personnal Access Token
@@ -92,23 +109,48 @@ def create_merge_request(commit_message: str, description: str, label: str):
         print("\n[bold yellow]:warning: Attention ! En mode MR, veuillez charger dans votre contexte la variable : \"ERPC_GITLAB_PRIVATE_TOKEN\" [/bold yellow]")
         sys.exit(1)
 
-
     # Construction des variables générales
     project_id = gitlab_utils.get_project_id(token, get_current_directory_name(), "erpc-group")
     url = f"https://gitlab.com/api/v4/projects/{project_id}/merge_requests"
-
-    # Titre
     title = commit_message
     params = f"title={title}"
+    if not description:
+        description = regex.extract_after_first_colon(commit_message);
+    jeux_de_variables = {
+        "description": description,
+        "time_review": time_review,
+    }
+
+    ## Ticket
+    ticket = regex.getTicket(commit_message)
+    if ticket:
+        jeux_de_variables['ticket'] = ticket
+
+    # Tâches
+    if tasks:
+        jeux_de_variables['tasks'] = tasks
+
+    # Envs
+    if envs:
+        jeux_de_variables['envs'] = envs
+
+    # Tests
+    if tests:
+        jeux_de_variables['tests'] = tests
+
+    # Notes
+    if notes:
+        jeux_de_variables['notes'] = notes
 
     # Description
-    # description = "test"
-    params += f"&description={description}"
+    mr_description = renderer.build_mr_description(jeux_de_variables)
+    if mr_description:
+        # print(mr_description)
+        params += f"&description={mr_description}"
 
     # Labels
     if label:
         params += f"&labels={label}"
-
 
     ## Branches
     source_branch = subprocess.getoutput('git rev-parse --abbrev-ref HEAD')
@@ -128,7 +170,7 @@ def create_merge_request(commit_message: str, description: str, label: str):
         url
     ]
 
-    print(command)
+    # print(command)
 
     result = subprocess.run(command, capture_output=True, text=True, check=False)
 
