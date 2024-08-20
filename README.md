@@ -22,6 +22,22 @@ Son objectif est d'embarquer tout le code non commité localement et de le push 
     compush --help
 ```
 
+### Exemple
+
+```sh
+    # Commit et push le code et créer une MR avec les paramètre renseignés
+    compush "feat(TGDC-5572): Ajout nouvelle fonctionnalité des plus intéressantes" \
+        --mr \
+        --label ops \
+        --time-review "2 heures" \
+        --task "OKAjout d'une nouvelle fonction" \
+        --task "BSR: Nettoyage code sale" \
+        --env dev \
+        --env OKprod \
+        --test "OKLe bug est réparé" \
+        --notes "Voilà une super note !"
+```
+
 ## Fonctionnalités
 
 * [x] Avoir un readme plus correct ..
