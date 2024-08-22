@@ -3,7 +3,7 @@ import json
 
 def get_project_id(api_token, project_name, keyword):
     """Commande curl pour rechercher un projet"""
-    
+
     curl_command = [
         "curl", "-s",
         "-H", f"PRIVATE-TOKEN: {api_token}",

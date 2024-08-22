@@ -95,11 +95,15 @@ def create_merge_request(
 
     print("\n[bold]:left_arrow_curving_right: Création merge request ..[/bold]")
 
+    if subprocess.getoutput('git rev-parse --abbrev-ref HEAD') in ["master", "main"]:
+        print("\n[bold yellow]:warning: :safety_vest: Attention ! La branche courante est déjà master ou main. Pas de MR possible.[/bold yellow]")
+        sys.exit(0)
+
     # Vérification des variables obligatoires
 
      ## Time_review
     if not time_review:
-        print("\n[bold yellow]:warning: Attention ! En mode MR, veuillez renseigner un temps de relecture : --time_review \"2 mins\" [/bold yellow]")
+        print("\n[bold yellow]:warning: Attention ! En mode MR, veuillez renseigner un temps de relecture : --time-review \"2 mins\" [/bold yellow]")
         sys.exit(1)
 
     ## Personnal Access Token
