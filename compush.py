@@ -220,15 +220,23 @@ def generate_branch_name_ai(commit: str):
 
     requete = ' '.join(directives)
 
-    chat_response = client.chat.complete(
-        model = model,
-        messages = [
-            {
-                "role": "user",
-                "content": requete,
-            },
-        ]
-    )
+    try:
+        chat_response = client.chat.complete(
+            model = model,
+            messages = [
+                {
+                    "role": "user",
+                    "content": requete,
+                },
+            ]
+        )
+    except Exception as e:
+        print(e)
+        print("[bold yellow]:warning: Echec de l'appel à Mistral.[/bold yellow]")
+        print("Entrez un nom de branche:")
+        branch_name = input()
+        return branch_name
+
 
     return chat_response.choices[0].message.content
 

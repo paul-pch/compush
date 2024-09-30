@@ -40,13 +40,13 @@ Son objectif est d'embarquer tout le code non commité localement et de le push 
 
 ## Fonctionnalités
 
-* [x] Avoir un readme plus correct ..
-* [x] Commit/Push tout le code en cours avec un message de commit passé en paramètre
-* [x] Ne pas commit sur `master` ou `main`
-* [x] Génération automatique d'un nom de branche spécifique par AI (mistral) si la branche courante est `master` ou `main`.
-* [x] Créer automatiquement une MR gitlab avec un jeu de paramètres dédiés
-* [ ] Générer le message de commit par IA en fonction du git diff
-* [ ] Ajouter un mode offline
-* [ ] Rendre la création de MR interractive pour simplifier la commande
-* [ ] Ajouter une option pour push sur slack direct
-
+- [x] Avoir un readme plus correct ..
+- [x] Commit/Push tout le code en cours avec un message de commit passé en paramètre
+- [x] Ne pas commit sur `master` ou `main`
+- [x] Génération automatique d'un nom de branche spécifique par AI (mistral) si la branche courante est `master` ou `main`.
+- [x] Créer automatiquement une MR gitlab avec un jeu de paramètres dédiés
+- [ ] Générer le message de commit par IA en fonction du git diff
+- [ ] Ajouter un mode offline
+- [ ] Utiliser des noms de branche avec des '/' exemple -> fix/un_correctif_parmis_dautres
+- [ ] Rendre la création de MR interractive pour simplifier la commande
+- [ ] Ajouter une option pour push sur slack direct
