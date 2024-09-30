@@ -6,6 +6,7 @@ from typing import List, Optional
 import os
 import subprocess
 import sys
+import json
 import typer
 
 from mistralai import Mistral
@@ -15,10 +16,9 @@ from typing_extensions import Annotated
 import gitlab_utils
 import renderer
 import regex
-import json
 
 api_key = os.environ["MISTRAL_API_KEY"]
-model = "mistral-large-latest"
+MODEL = "mistral-large-latest"
 client = Mistral(api_key=api_key)
 
 
@@ -119,7 +119,7 @@ def create_merge_request(
     title = commit_message
     params = f"title={title}"
     if not description:
-        description = regex.extract_after_first_colon(commit_message);
+        description = regex.extract_after_first_colon(commit_message)
     jeux_de_variables = {
         "description": description,
         "time_review": time_review,
@@ -188,8 +188,6 @@ def create_merge_request(
         print("Erreur: ", result.stderr)
         sys.exit(1)
 
-
-
 def get_current_directory_name():
     """Renvoie le nom du dossier courant"""
     # Obtenir le chemin du répertoire courant
@@ -222,7 +220,7 @@ def generate_branch_name_ai(commit: str):
 
     try:
         chat_response = client.chat.complete(
-            model = model,
+            model = MODEL,
             messages = [
                 {
                     "role": "user",
