@@ -46,7 +46,7 @@ Son objectif est d'embarquer tout le code non commité localement et de le push 
 - [x] Génération automatique d'un nom de branche spécifique par AI (mistral) si la branche courante est `master` ou `main`.
 - [x] Créer automatiquement une MR gitlab avec un jeu de paramètres dédiés
 - [ ] Générer le message de commit par IA en fonction du git diff
-- [ ] Ajouter un mode offline
+- [x] Ajouter un mode offline
 - [ ] Utiliser des noms de branche avec des '/' exemple -> fix/un_correctif_parmis_dautres
 - [ ] Rendre la création de MR interractive pour simplifier la commande
 - [ ] Ajouter une option pour push sur slack direct

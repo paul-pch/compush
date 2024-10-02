@@ -1,6 +1,6 @@
 import re
 
-def getTicket(string):
+def get_ticket(string):
     # Expression régulière pour extraire la valeur entre parenthèses
     pattern = r'\(([A-Z]+-\d+)\)'
 
@@ -11,8 +11,6 @@ def getTicket(string):
         return match.group(1)
     else:
         return None
-
-import re
 
 def extract_after_first_colon(string: str) -> str:
     """

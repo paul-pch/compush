@@ -72,7 +72,7 @@ def commit_code(commit_message: str, master: bool, branch: str):
         # Commit du code
         print("\n[bold]:left_arrow_curving_right: Commit/push ..[/bold]")
         subprocess.run(['git add .'], shell=True, check=False)
-        subprocess.run([f"git commit -m \"{commit_message}\""], shell=True, check=False)
+        subprocess.run([f"git commit -m \"{commit_message}\""], shell=True, check=True)
 
         push = subprocess.run(['git push'], shell=True, check=True)
         if push.returncode == 0:
@@ -126,7 +126,7 @@ def create_merge_request(
     }
 
     ## Ticket
-    ticket = regex.getTicket(commit_message)
+    ticket = regex.get_ticket(commit_message)
     if ticket:
         jeux_de_variables['ticket'] = ticket
 
