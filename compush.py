@@ -26,6 +26,7 @@ def main(
     commit_message: Annotated[str, typer.Argument(help="Message de commit à pusher avec les modifications en cours.")],
     master: Annotated[Optional[bool], typer.Option(help="Permet de forcer le push sur master")] = False,
     branch: Annotated[Optional[str], typer.Option(help="Permet de forcer un nom de branche git (seulement si l'actuelle est master ou main)")] = None,
+    remote: Annotated[Optional[str], typer.Option(help="Permet de préciser un remote git déjà configuré")] = "origin",
     mr: Annotated[Optional[bool], typer.Option(help="Déclenche la création d'une merge request sur gitlab")] = False,
     label: Annotated[Optional[str], typer.Option(help="Mode MR - Permet d'ajouter un label à la merge request")] = None,
     time_review: Annotated[Optional[str], typer.Option(help="Mode MR - Permet d'ajouter un temps de relecture à la merge request")] = None,
@@ -39,13 +40,13 @@ def main(
     """Fonction racine"""
 
     ## Commit code
-    commit_code(commit_message, master, branch)
+    commit_code(commit_message, master, branch, remote)
 
     ## Merge Request
     if mr:
         create_merge_request(commit_message, description, time_review, label, task, env, test, notes)
 
-def commit_code(commit_message: str, master: bool, branch: str):
+def commit_code(commit_message: str, master: bool, branch: str, remote: str):
     """Méthode de commit et push du code courant"""
 
     # Vérifie si des changements sont en attente
@@ -66,8 +67,7 @@ def commit_code(commit_message: str, master: bool, branch: str):
 
             print(f"\n[bold]:left_arrow_curving_right: Changement de branche: {new_branch} [/bold]")
             subprocess.run([f"git checkout -b {new_branch}"], shell=True, check=False)
-            subprocess.run([f"git push -u origin {new_branch}"], shell=True, check=False)
-
+            subprocess.run([f"git push -u {remote}' {new_branch}"], shell=True, check=False)
 
         # Commit du code
         print("\n[bold]:left_arrow_curving_right: Commit/push ..[/bold]")
