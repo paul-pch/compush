@@ -55,6 +55,7 @@ def commit_code(commit_message: str, master: bool, branch: str, remote: str):
     if changements_git == 0:
         print("[bold green]:white_check_mark: Pas de changement détecté ![/bold green]")
     else:
+
         # Vérifie que la branche n'est pas 'master' ou 'main'
         ## Génère une branche en fonction du commit message et se positionne dessus
         print("[bold]:left_arrow_curving_right: Vérification de la branche ..[/bold]")
@@ -67,14 +68,14 @@ def commit_code(commit_message: str, master: bool, branch: str, remote: str):
 
             print(f"\n[bold]:left_arrow_curving_right: Changement de branche: {new_branch} [/bold]")
             subprocess.run([f"git checkout -b {new_branch}"], shell=True, check=False)
-            subprocess.run([f"git push -u {remote}' {branch}"], shell=True, check=False)
+
 
         # Commit du code
         print("\n[bold]:left_arrow_curving_right: Commit/push ..[/bold]")
         subprocess.run(['git add .'], shell=True, check=False)
         subprocess.run([f"git commit -m \"{commit_message}\""], shell=True, check=True)
 
-        push = subprocess.run([f'git push -u {remote} {current_branch}'], shell=True, check=True)
+        push = subprocess.run([f'git push'], shell=True, check=True)
         if push.returncode == 0:
             print("\n[bold green]:white_check_mark: Code compushed ![/bold green]")
         else:
