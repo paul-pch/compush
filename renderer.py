@@ -2,7 +2,8 @@ import sys
 
 from typing import Dict
 
-import template.mr_erpc
+import template.mr_template
+
 
 def build_mr_description(jeux_de_variables: Dict[str, str]):
     required_keys = {'description', 'time_review'}
@@ -12,32 +13,30 @@ def build_mr_description(jeux_de_variables: Dict[str, str]):
         if not isinstance(jeux_de_variables[key], str):
             raise TypeError(f"La valeur de la clé '{key}' doit être une chaîne de caractères.")
 
-
-    mr_description = render_template(template.mr_erpc.erpc_init, jeux_de_variables)
+    mr_description = render_template(template.mr_template.mr_init, jeux_de_variables)
 
     if 'ticket' in jeux_de_variables and jeux_de_variables['ticket']:
-        mr_description += render_template(template.mr_erpc.erpc_ticket, jeux_de_variables)
+        mr_description += render_template(template.mr_template.mr_ticket, jeux_de_variables)
 
     if 'tasks' in jeux_de_variables and jeux_de_variables['tasks']:
-        mr_description += template.mr_erpc.erpc_tasks_title
+        mr_description += template.mr_template.mr_tasks_title
         for task in jeux_de_variables['tasks']:
             mr_description += format_checkbox(task)
 
     if 'envs' in jeux_de_variables and jeux_de_variables['envs']:
-        mr_description += template.mr_erpc.erpc_env_title
+        mr_description += template.mr_template.mr_env_title
         for env in jeux_de_variables['envs']:
             mr_description += format_checkbox(env)
 
     if 'tests' in jeux_de_variables and jeux_de_variables['tests']:
-        mr_description += template.mr_erpc.erpc_tests_title
+        mr_description += template.mr_template.mr_tests_title
         for test in jeux_de_variables['tests']:
             mr_description += format_checkbox(test)
 
     if 'notes' in jeux_de_variables and jeux_de_variables['notes']:
-        mr_description += render_template(template.mr_erpc.erpc_notes, jeux_de_variables)
+        mr_description += render_template(template.mr_template.mr_notes, jeux_de_variables)
 
     return mr_description
-
 
 
 def render_template(template, variables):
@@ -53,6 +52,7 @@ def render_template(template, variables):
     except KeyError as e:
         print(f"Erreur: Le placeholder '{e.args[0]}' n'a pas été trouvé dans les variables fournies.")
         sys.exit(1)
+
 
 def format_checkbox(task: str) -> str:
     """
@@ -77,54 +77,3 @@ def format_checkbox(task: str) -> str:
         formatted_task = "* [ ] " + task.strip() + "\n"
 
     return formatted_task
-
-
-
-#### ==========
-# Exemple d'utilisation
-
-# template = """
-# Temps de review : **~{time_review}>.**
-
-# ## Pourquoi cette MR ?
-
-# {description}
-
-# """
-
-# variables = {
-#     "objectif": "améliorer la documentation",
-#     "date_debut": "01/01/2023",
-#     "responsable": "Jean Dupont",
-#     "statut": "En cours"
-# }
-
-# rendered_template = render_template(template, variables)
-
-# if rendered_template:
-#     print(rendered_template)
-
-
-
-#### ==========
-# A ajouter
-
-# ## Ce qui a été fait dans cette MR
-
-# <Expliquer ce qui a été fait pour résoudre notre problématique>
-
-# * [ ] <FOREACH --task>
-
-# <Identifier les environnements concernés (liste non exhaustive car dépendante des projets)>
-# * [ ] <FOREACH --env>
-
-
-# ## Tests d'acceptance
-
-# <Expliquer la marche à suivre pour valider que le comportement recherché est bien implémenté>
-# * [ ] <FOREACH --test>
-
-
-# ## Note(s)
-
-# notes <NOTES --notes>

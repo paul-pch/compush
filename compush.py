@@ -1,4 +1,4 @@
-"""Compush CLI"""
+""" Compush CLI """
 #!/usr/bin/python3
 
 from typing import List, Optional
@@ -39,25 +39,26 @@ def main(
 ):
     """Fonction racine"""
 
-    ## Commit code
+    # Commit code
     commit_code(commit_message, master, branch, remote)
 
-    ## Merge Request
+    # Merge Request
     if mr:
         create_merge_request(commit_message, description, time_review, label, task, env, test, notes)
+
 
 def commit_code(commit_message: str, master: bool, branch: str, remote: str):
     """Méthode de commit et push du code courant"""
 
     # Vérifie si des changements sont en attente
-    result = subprocess.run(["git status --porcelain=v1 | wc -l" ], shell=True, capture_output=True, check=False)
+    result = subprocess.run(["git status --porcelain=v1 | wc -l"], shell=True, capture_output=True, check=False)
     changements_git = int(result.stdout.decode().strip())
     if changements_git == 0:
         print("[bold green]:white_check_mark: Pas de changement détecté ![/bold green]")
     else:
 
         # Vérifie que la branche n'est pas 'master' ou 'main'
-        ## Génère une branche en fonction du commit message et se positionne dessus
+        # Génère une branche en fonction du commit message et se positionne dessus
         print("[bold]:left_arrow_curving_right: Vérification de la branche ..[/bold]")
         current_branch = subprocess.getoutput('git rev-parse --abbrev-ref HEAD')
         if current_branch in ["master", "main"] and not master:
@@ -69,18 +70,18 @@ def commit_code(commit_message: str, master: bool, branch: str, remote: str):
             print(f"\n[bold]:left_arrow_curving_right: Changement de branche: {new_branch} [/bold]")
             subprocess.run([f"git checkout -b {new_branch}"], shell=True, check=False)
 
-
         # Commit du code
         print("\n[bold]:left_arrow_curving_right: Commit/push ..[/bold]")
         subprocess.run(['git add .'], shell=True, check=False)
         subprocess.run([f"git commit -m \"{commit_message}\""], shell=True, check=True)
 
-        push = subprocess.run([f'git push'], shell=True, check=True)
+        push = subprocess.run(["git push"], shell=True, check=True)
         if push.returncode == 0:
             print("\n[bold green]:white_check_mark: Code compushed ![/bold green]")
         else:
             print("\n[bold red]:building_construction: Erreur - Problème lors du push du code ... [/bold red]")
             sys.exit(1)
+
 
 def create_merge_request(
     commit_message: str,
@@ -91,7 +92,7 @@ def create_merge_request(
     envs: List[str],
     tests: List[str],
     notes: str
-    ):
+):
     """Méthode de création de merge request avec les informations passées en paramètre"""
 
     print("\n[bold]:left_arrow_curving_right: Création merge request ..[/bold]")
@@ -102,21 +103,21 @@ def create_merge_request(
 
     # Vérification des variables obligatoires
 
-     ## Time_review
+    # Time_review
     if not time_review:
         print("\n[bold yellow]:warning: Attention ! En mode MR, veuillez renseigner un temps de relecture : --time-review \"2 mins\" [/bold yellow]")
         sys.exit(1)
 
-    ## Personnal Access Token
+    # Personnal Access Token
     try:
-        token = os.environ["ERPC_GITLAB_PRIVATE_TOKEN"]
+        token = os.environ["SIV_GITLAB_PRIVATE_TOKEN"]
     except KeyError:
-        print("\n[bold yellow]:warning: Attention ! En mode MR, veuillez charger dans votre contexte la variable : \"ERPC_GITLAB_PRIVATE_TOKEN\" [/bold yellow]")
+        print("\n[bold yellow]:warning: Attention ! En mode MR, veuillez charger dans votre contexte la variable: \"SIV_GITLAB_PRIVATE_TOKEN\" [/bold yellow]")
         sys.exit(1)
 
     # Construction des variables générales
-    project_id = gitlab_utils.get_project_id(token, get_current_directory_name(), "erpc-group")
-    url = f"https://gitlab.com/api/v4/projects/{project_id}/merge_requests"
+    project_id = gitlab_utils.get_project_id(token, get_current_directory_name(), "siv")
+    url = f"https://innersource.soprasteria.com/api/v4/projects/{project_id}/merge_requests"
     title = commit_message
     params = f"title={title}"
     if not description:
@@ -126,7 +127,7 @@ def create_merge_request(
         "time_review": time_review,
     }
 
-    ## Ticket
+    # Ticket
     ticket = regex.get_ticket(commit_message)
     if ticket:
         jeux_de_variables['ticket'] = ticket
@@ -157,7 +158,7 @@ def create_merge_request(
     if label:
         params += f"&labels={label}"
 
-    ## Branches
+    # Branches
     source_branch = subprocess.getoutput('git rev-parse --abbrev-ref HEAD')
     try:
         target_branch = get_default_branch()
@@ -165,7 +166,6 @@ def create_merge_request(
         print(e)
         sys.exit(1)
     params += f"&source_branch={source_branch}&target_branch={target_branch}"
-
 
     command = [
         "curl",
@@ -189,6 +189,7 @@ def create_merge_request(
         print("Erreur: ", result.stderr)
         sys.exit(1)
 
+
 def get_current_directory_name():
     """Renvoie le nom du dossier courant"""
     # Obtenir le chemin du répertoire courant
@@ -197,14 +198,16 @@ def get_current_directory_name():
     current_directory_name = os.path.basename(current_path)
     return current_directory_name
 
+
 def get_default_branch():
     """Renvoie le nom de la branche courante"""
     branches = ["master", "main"]
     for branch in branches:
-        result = subprocess.run(['git', 'show-ref', '--verify', f'refs/heads/{branch}'], capture_output=True, text=True, check=True)
+        result = subprocess.run(['git', 'show-ref', '--verify', f'refs/heads/{branch}'], capture_output=True, text=True, check=False)
         if result.returncode == 0:
             return branch
     raise Exception("\n[bold yellow]:warning: Attention ! Aucune des branches 'master' ou 'main' n'existe. [/bold yellow]")
+
 
 def generate_branch_name_ai(commit: str):
     """Génère un nom de branche au travers de l'API Mistral AI"""
@@ -221,8 +224,8 @@ def generate_branch_name_ai(commit: str):
 
     try:
         chat_response = client.chat.complete(
-            model = MODEL,
-            messages = [
+            model=MODEL,
+            messages=[
                 {
                     "role": "user",
                     "content": requete,
@@ -236,8 +239,8 @@ def generate_branch_name_ai(commit: str):
         branch_name = input()
         return branch_name
 
-
     return chat_response.choices[0].message.content
+
 
 if __name__ == "__main__":
     typer.run(main)
