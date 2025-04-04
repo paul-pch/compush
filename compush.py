@@ -68,11 +68,14 @@ def commit_code(commit_message: str, master: bool, branch: str, remote: str):
                 new_branch = generate_branch_name_ai(commit_message)
 
             print(f"\n[bold]:left_arrow_curving_right: Changement de branche: {new_branch} [/bold]")
-            subprocess.run([f"git checkout -b {new_branch}"], shell=True, check=False)
+            subprocess.run([f"git checkout -b {new_branch}"], shell=True, check=True)
+        else:
+            if branch and branch != current_branch:
+                subprocess.run([f"git checkout -b {branch}"], shell=True, check=True)
 
         # Commit du code
         print("\n[bold]:left_arrow_curving_right: Commit/push ..[/bold]")
-        subprocess.run(['git add .'], shell=True, check=False)
+        subprocess.run(['git add .'], shell=True, check=True)
         subprocess.run([f"git commit -m \"{commit_message}\""], shell=True, check=True)
 
         push = subprocess.run(["git push"], shell=True, check=True)
