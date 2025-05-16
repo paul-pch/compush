@@ -178,14 +178,12 @@ def create_merge_request(
         url
     ]
 
-    # print(command)
-
     result = subprocess.run(command, capture_output=True, text=True, check=False)
 
     if result.returncode == 0:
         print("\n[bold green]:white_check_mark: Merge request créée avec succès. ![/bold green]")
         projects = json.loads(result.stdout)
-        print(f"\n[bold]:left_arrow_curving_right: {projects.get("web_url")} [/bold]")
+        print(f"\n[bold]:left_arrow_curving_right: {projects.get('web_url')} [/bold]")
 
     else:
         print("\n[bold red]:building_construction: Erreur - Problème lors du push du code ... [/bold red]")
