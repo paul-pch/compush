@@ -46,7 +46,7 @@ Son objectif est d'embarquer tout le code non commité localement et de le push 
 - [x] Génération automatique d'un nom de branche spécifique par AI (mistral) si la branche courante est `master` ou `main`.
 - [x] Créer automatiquement une MR gitlab avec un jeu de paramètres dédiés
 - [x] Ajouter un mode offline
-- [ ] Utiliser des noms de branche avec des '/' exemple -> fix/un_correctif_parmis_dautres
+- [x] Utiliser des noms de branche avec des '/' exemple -> fix/un_correctif_parmis_dautres
 - [ ] Ajouter une option pour push sur Teams direct
 - [ ] Ajoutter des exemple d'utilisation dans les description du helper
 
@@ -54,4 +54,5 @@ Son objectif est d'embarquer tout le code non commité localement et de le push 
 - [ ] Générer le message de commit par IA en fonction du git diff
 - [ ] Rendre la création de MR interractive pour simplifier la commande
 - [ ] Rendre la partie MR plus indépendante de gitlab.com ou deinnersource (fichier de config local ?)
+- [ ] Gérer le cas sans clée mistral
 

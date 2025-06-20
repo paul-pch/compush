@@ -216,9 +216,10 @@ def generate_branch_name_ai(commit: str):
     print("\n[bold]:left_arrow_curving_right: Génération d'une branche.. [/bold]")
     directives = [
         f"Génère moi un nom de branch en fonction du nom de commit suivant : {commit} .",
-        "Je ne veux pas de / ou de - mais des _ à la place.",
+        "Je veux le format : (feat|fix|chore) en préfix, puis un /, puis le commit reformulé au plus simple",
+        "exemple: feat/ajout_fonctionnalite_simple"
         "Renvoie moi uniquement le nom de la branche et rien d'autre.",
-        "Reformule légèrement, enlève les doublons et les connecteurs"
+        "Reformule légèrement pour une simplicité maximale, enlève les doublons et les connecteurs. Pas d'accent ou caractères spéciaux."
         ]
 
     requete = ' '.join(directives)
