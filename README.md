@@ -54,4 +54,5 @@ Son objectif est d'embarquer tout le code non commité localement et de le push 
 - [ ] Générer le message de commit par IA en fonction du git diff
 - [ ] Rendre la création de MR interractive pour simplifier la commande
 - [ ] Rendre la partie MR plus indépendante de gitlab.com ou deinnersource (fichier de config local ?)
+- [ ] Gérer le cas sans clée mistral
 
