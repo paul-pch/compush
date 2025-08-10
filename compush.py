@@ -11,15 +11,12 @@ import typer
 
 from mistralai import Mistral
 from rich import print
+from rich.prompt import Prompt
 from typing_extensions import Annotated
 
 import gitlab_utils
 import renderer
 import regex
-
-api_key = os.environ["MISTRAL_API_KEY"]
-MODEL = "mistral-large-latest"
-client = Mistral(api_key=api_key)
 
 
 def main(
@@ -78,12 +75,16 @@ def commit_code(commit_message: str, master: bool, branch: str, remote: str):
         subprocess.run(['git add .'], shell=True, check=True)
         subprocess.run([f"git commit -m \"{commit_message}\""], shell=True, check=True)
 
-        push = subprocess.run(["git push"], shell=True, check=True)
-        if push.returncode == 0:
-            print("\n[bold green]:white_check_mark: Code compushed ![/bold green]")
+        result = subprocess.run(['git', 'remote'], capture_output=True, text=True, check=True)
+        if result.stdout.strip():
+            push = subprocess.run(["git push"], shell=True, check=True)
+            if push.returncode == 0:
+                print("\n[bold green]:white_check_mark: Code compushed ![/bold green]")
+            else:
+                print("\n[bold red]:building_construction: Erreur - Problème lors du push du code ... [/bold red]")
+                sys.exit(1)
         else:
-            print("\n[bold red]:building_construction: Erreur - Problème lors du push du code ... [/bold red]")
-            sys.exit(1)
+            print("\n[bold yellow]:warning: :safety_vest: Aucun remote n'est configuré.[/bold yellow]")
 
 
 def create_merge_request(
@@ -95,7 +96,7 @@ def create_merge_request(
     envs: List[str],
     tests: List[str],
     notes: str
-):
+    ):
     """Méthode de création de merge request avec les informations passées en paramètre"""
 
     print("\n[bold]:left_arrow_curving_right: Création merge request ..[/bold]")
@@ -213,10 +214,19 @@ def get_default_branch():
 def generate_branch_name_ai(commit: str):
     """Génère un nom de branche au travers de l'API Mistral AI"""
 
+    api_key = os.environ["MISTRAL_API_KEY"]
+    
+    if api_key is None:
+        print("\n[bold red]:building_construction: Erreur - variable MISTRAL_API_KEY manquante ... [/bold red]")
+        sys.exit(1)
+    
+    MODEL = "mistral-large-latest"
+    client = Mistral(api_key=api_key)
+
     print("\n[bold]:left_arrow_curving_right: Génération d'une branche.. [/bold]")
     directives = [
         f"Génère moi un nom de branch en fonction du nom de commit suivant : {commit} .",
-        "Je veux le format : (feat|fix|chore) en préfix, puis un /, puis le commit reformulé au plus simple",
+        "Je veux que la branche respecte les normes de conventionnal commit",
         "exemple: feat/ajout_fonctionnalite_simple"
         "Renvoie moi uniquement le nom de la branche et rien d'autre.",
         "Reformule légèrement pour une simplicité maximale, enlève les doublons et les connecteurs. Pas d'accent ou caractères spéciaux."
@@ -236,12 +246,11 @@ def generate_branch_name_ai(commit: str):
         )
     except Exception as e:
         print(e)
-        print("[bold yellow]:warning: Echec de l'appel à Mistral.[/bold yellow]")
-        print("Entrez un nom de branche:")
-        branch_name = input()
+        print("[bold yellow]:warning: Echec de l'appel à Mistral.[/bold yellow]\n")
+        branch_name = Prompt.ask("[bold blue]:right_arrow:  Entrez un nom de branche [/bold blue]")
         return branch_name
 
-    return chat_response.choices[0].message.content
+    return chat_response.choices[0].message.content.strip()
 
 
 if __name__ == "__main__":

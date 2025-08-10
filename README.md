@@ -49,9 +49,8 @@ Son objectif est d'embarquer tout le code non commité localement et de le push 
 - [x] Utiliser des noms de branche avec des '/' exemple -> fix/un_correctif_parmis_dautres
 - [ ] Ajouter une option pour push sur Teams direct
 - [ ] Ajoutter des exemple d'utilisation dans les description du helper
-- [ ] Si pas de remote alors pas de git push
+- [x] Si pas de remote alors pas de git push
 
-- [ ] Ajouter `git config --global push.default current` si un git push fail à cause de : fatal: The current branch chore_test has no upstream branch
 - [ ] Générer le message de commit par IA en fonction du git diff
 - [ ] Rendre la création de MR interractive pour simplifier la commande
 - [ ] Rendre la partie MR plus indépendante de gitlab.com ou deinnersource (fichier de config local ?)
