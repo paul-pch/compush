@@ -1,5 +1,16 @@
+PYTHON := python3
+VENV_DIR := venv
 
 all: install integrate
+
+.PHONY: venv
+venv:
+	$(PYTHON) -m venv $(VENV_DIR)
+	@echo "Virtual environment created in $(VENV_DIR)"
+
+.PHONY: clean-venv
+clean-venv:
+	rm -rf $(VENV_DIR)
 
 install:
 	pyinstaller --onefile compush.py
