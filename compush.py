@@ -240,7 +240,8 @@ def generate_branch_name_ai(commit: str):
         f"Génère moi un nom de branch en fonction du nom de commit suivant : {commit} .",
         "Je veux que la branche respecte les normes de conventionnal commit",
         "exemple: feat/ajout_fonctionnalite_simpleRenvoie moi uniquement le nom de la branche et rien d'autre.",
-        "Reformule légèrement pour une simplicité maximale, enlève les doublons et les connecteurs. Pas d'accent ou caractères spéciaux.",
+        "Reformule légèrement pour une simplicité maximale, enlève les doublons et les connecteurs.",
+        "Pas d'accent ou caractères spéciaux. Pas de quote, rien que la branche en pure string.",
     ]
 
     requete = " ".join(directives)
