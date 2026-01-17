@@ -1,45 +1,42 @@
 import sys
-
 from typing import Dict
 
 import template.mr_template
 
 
 def build_mr_description(jeux_de_variables: Dict[str, str]):
-    required_keys = {'description', 'time_review'}
+    required_keys = {"description", "time_review"}
     for key in required_keys:
         if key not in jeux_de_variables:
             raise KeyError(f"La clé '{key}' est manquante dans les variables fournies.")
-        if not isinstance(jeux_de_variables[key], str):
-            raise TypeError(f"La valeur de la clé '{key}' doit être une chaîne de caractères.")
 
     mr_description = render_template(template.mr_template.mr_init, jeux_de_variables)
 
-    if 'ticket' in jeux_de_variables and jeux_de_variables['ticket']:
+    if "ticket" in jeux_de_variables and jeux_de_variables["ticket"]:
         mr_description += render_template(template.mr_template.mr_ticket, jeux_de_variables)
 
-    if 'tasks' in jeux_de_variables and jeux_de_variables['tasks']:
+    if "tasks" in jeux_de_variables and jeux_de_variables["tasks"]:
         mr_description += template.mr_template.mr_tasks_title
-        for task in jeux_de_variables['tasks']:
+        for task in jeux_de_variables["tasks"]:
             mr_description += format_checkbox(task)
 
-    if 'envs' in jeux_de_variables and jeux_de_variables['envs']:
+    if "envs" in jeux_de_variables and jeux_de_variables["envs"]:
         mr_description += template.mr_template.mr_env_title
-        for env in jeux_de_variables['envs']:
+        for env in jeux_de_variables["envs"]:
             mr_description += format_checkbox(env)
 
-    if 'tests' in jeux_de_variables and jeux_de_variables['tests']:
+    if "tests" in jeux_de_variables and jeux_de_variables["tests"]:
         mr_description += template.mr_template.mr_tests_title
-        for test in jeux_de_variables['tests']:
+        for test in jeux_de_variables["tests"]:
             mr_description += format_checkbox(test)
 
-    if 'notes' in jeux_de_variables and jeux_de_variables['notes']:
+    if "notes" in jeux_de_variables and jeux_de_variables["notes"]:
         mr_description += render_template(template.mr_template.mr_notes, jeux_de_variables)
 
     return mr_description
 
 
-def render_template(template, variables):
+def render_template(template: str, variables: Dict[str, str]):
     """
     Remplace les placeholders dans le template par les valeurs des variables.
 

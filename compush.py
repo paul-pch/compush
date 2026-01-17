@@ -1,5 +1,5 @@
 """Compush CLI"""
-#!/usr/bin/python3
+# !/usr/bin/python3
 
 import json
 import os
@@ -21,22 +21,15 @@ import renderer
 
 def main(
     commit_message: Annotated[str, typer.Argument(help="Message de commit à pusher avec les modifications en cours.")],
-    master: Annotated[Optional[bool], typer.Option(help="Permet de forcer le push sur master")] = False,
-    branch: Annotated[
-        Optional[str], typer.Option(help="Permet de forcer un nom de branche git (seulement si l'actuelle est master ou main)")
-    ] = None,
+    master: Annotated[bool, typer.Option(help="Permet de forcer le push sur master")] = False,
+    branch: Annotated[Optional[str], typer.Option(help="Permet de forcer un nom de branche git (seulement si l'actuelle est master ou main)")] = None,
     remote: Annotated[Optional[str], typer.Option(help="Permet de préciser un remote git déjà configuré")] = "origin",
-    mr: Annotated[Optional[bool], typer.Option(help="Déclenche la création d'une merge request sur gitlab")] = False,
+    mr: Annotated[bool, typer.Option(help="Déclenche la création d'une merge request sur gitlab")] = False,
     label: Annotated[Optional[str], typer.Option(help="Mode MR - Permet d'ajouter un label à la merge request")] = None,
-    time_review: Annotated[
-        Optional[str], typer.Option(help="Mode MR - Permet d'ajouter un temps de relecture à la merge request")
-    ] = None,
-    description: Annotated[
-        Optional[str], typer.Option(help="Mode MR - Permet d'ajouter un entête descriptif à la merge request")
-    ] = None,
+    time_review: Annotated[Optional[str], typer.Option(help="Mode MR - Permet d'ajouter un temps de relecture à la merge request")] = None,
+    description: Annotated[Optional[str], typer.Option(help="Mode MR - Permet d'ajouter un entête descriptif à la merge request")] = None,
     task: Annotated[
-        Optional[List[str]],
-        typer.Option(help="Mode MR - Permet d'ajouter des tâches réalisées à la description de merge request"),
+        Optional[List[str]], typer.Option(help="Mode MR - Permet d'ajouter des tâches réalisées à la description de merge request")
     ] = None,
     env: Annotated[
         Optional[List[str]], typer.Option(help="Mode MR - Permet d'ajouter des environnements à la description de merge request")
@@ -87,7 +80,7 @@ def commit_code(commit_message: str, master: bool, branch: str, remote: str):
 
         result = subprocess.run(["git", "remote"], capture_output=True, text=True, check=True)
         if result.stdout.strip():
-            push = subprocess.run(["git push"], shell=True, check=True)
+            push = subprocess.run(["git push --all"], shell=True, check=True)
             if push.returncode == 0:
                 print("\n[bold green]:white_check_mark: Code compushed ![/bold green]")
             else:
@@ -112,27 +105,21 @@ def create_merge_request(
     print("\n[bold]:left_arrow_curving_right: Création merge request ..[/bold]")
 
     if subprocess.getoutput("git rev-parse --abbrev-ref HEAD") in ["master", "main"]:
-        print(
-            "\n[bold yellow]:warning: :safety_vest: Attention ! La branche courante est déjà master ou main. Pas de MR possible.[/bold yellow]"
-        )
+        print("\n[bold yellow]:warning: :safety_vest: Attention ! La branche courante est déjà master ou main. Pas de MR possible.[/bold yellow]")
         sys.exit(0)
 
     # Vérification des variables obligatoires
 
     # Time_review
     if not time_review:
-        print(
-            '\n[bold yellow]:warning: Attention ! En mode MR, veuillez renseigner un temps de relecture : --time-review "2 mins" [/bold yellow]'
-        )
+        print('\n[bold yellow]:warning: Attention ! En mode MR, veuillez renseigner un temps de relecture : --time-review "2 mins" [/bold yellow]')
         sys.exit(1)
 
     # Personnal Access Token
     try:
         token = os.environ["SIV_GITLAB_PRIVATE_TOKEN"]
     except KeyError:
-        print(
-            '\n[bold yellow]:warning: Attention ! En mode MR, veuillez charger dans votre contexte la variable: "SIV_GITLAB_PRIVATE_TOKEN" [/bold yellow]'
-        )
+        print('\n[bold yellow]:warning: Attention ! En mode MR, veuillez charger dans votre contexte la variable: "SIV_GITLAB_PRIVATE_TOKEN" [/bold yellow]')
         sys.exit(1)
 
     # Construction des variables générales
@@ -215,9 +202,7 @@ def get_default_branch():
     """Renvoie le nom de la branche courante"""
     branches = ["master", "main"]
     for branch in branches:
-        result = subprocess.run(
-            ["git", "show-ref", "--verify", f"refs/heads/{branch}"], capture_output=True, text=True, check=False
-        )
+        result = subprocess.run(["git", "show-ref", "--verify", f"refs/heads/{branch}"], capture_output=True, text=True, check=False)
         if result.returncode == 0:
             return branch
     raise Exception("\n[bold yellow]:warning: Attention ! Aucune des branches 'master' ou 'main' n'existe. [/bold yellow]")
