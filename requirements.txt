@@ -1,5 +1,5 @@
-mistralai==1.0.1
-pyinstaller==6.10.0
-rich==13.7.1
+mistralai==1.10.1
+pyinstaller==6.18.0
+rich==14.2.0
 ruff==0.14.13
 typer==0.21.1

@@ -12,6 +12,10 @@ venv:
 clean-venv:
 	rm -rf $(VENV_DIR)
 
+.PHONY: upgrade
+upgrade:
+	./scripts/upgrade.sh requirements.txt
+
 install:
 	pyinstaller --onefile compush.py
 
