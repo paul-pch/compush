@@ -7,11 +7,8 @@ import subprocess
 import sys
 from typing import List, Optional
 
-import httpx
 import typer
-from mistralai import Mistral
 from rich import print
-from rich.prompt import Prompt
 from typing_extensions import Annotated
 
 import gitlab_utils
@@ -57,10 +54,10 @@ def commit_code(commit_message: str, master: bool, branch: str, remote: str):
         print("[bold]:left_arrow_curving_right: Vérification de la branche ..[/bold]")
         current_branch = subprocess.getoutput("git rev-parse --abbrev-ref HEAD")
         if current_branch in ["master", "main"] and not master:
-            new_branch = branch
+            new_branch: str = branch
             if not branch:
                 print("[bold yellow]:warning: Master detected ![/bold yellow]")
-                new_branch = generate_branch_name_ai(commit_message)
+                new_branch = input("Saisissez le nom de la branche : ")
 
             print(f"\n[bold]:left_arrow_curving_right: Changement de branche: {new_branch} [/bold]")
             subprocess.run([f"git checkout -b {new_branch}"], shell=True, check=True)
@@ -200,48 +197,6 @@ def get_default_branch():
         if result.returncode == 0:
             return branch
     raise Exception("\n[bold yellow]:warning: Attention ! Aucune des branches 'master' ou 'main' n'existe. [/bold yellow]")
-
-
-def generate_branch_name_ai(commit: str):
-    """Génère un nom de branche au travers de l'API Mistral AI"""
-
-    try:
-        api_key = os.environ["MISTRAL_API_KEY"]
-    except Exception:
-        print("\n[bold red]:warning:  Erreur - variable MISTRAL_API_KEY manquante ... [/bold red]")
-        sys.exit(1)
-
-    MODEL = "mistral-large-latest"
-    client = Mistral(api_key=api_key, client=httpx.Client(verify=False))
-
-    print("\n[bold]:left_arrow_curving_right: Génération d'une branche.. [/bold]")
-    directives = [
-        f"Génère moi un nom de branch en fonction du nom de commit suivant : {commit} .",
-        "Je veux que la branche respecte les normes de conventionnal commit",
-        "exemple: feat/ajout_fonctionnalite_simpleRenvoie moi uniquement le nom de la branche et rien d'autre.",
-        "Reformule légèrement pour une simplicité maximale, enlève les doublons et les connecteurs.",
-        "Pas d'accent ou caractères spéciaux. Pas de quote, rien que la branche en pure string.",
-    ]
-
-    requete = " ".join(directives)
-
-    try:
-        chat_response = client.chat.complete(
-            model=MODEL,
-            messages=[
-                {
-                    "role": "user",
-                    "content": requete,
-                },
-            ],
-        )
-    except Exception as e:
-        print(e)
-        print("[bold yellow]:warning: Echec de l'appel à Mistral.[/bold yellow]\n")
-        branch_name = Prompt.ask("[bold blue]:right_arrow:  Entrez un nom de branche [/bold blue]")
-        return branch_name
-
-    return chat_response.choices[0].message.content.strip()
 
 
 if __name__ == "__main__":
