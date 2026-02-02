@@ -28,15 +28,9 @@ def main(
     label: Annotated[Optional[str], typer.Option(help="Mode MR - Permet d'ajouter un label à la merge request")] = None,
     time_review: Annotated[Optional[str], typer.Option(help="Mode MR - Permet d'ajouter un temps de relecture à la merge request")] = None,
     description: Annotated[Optional[str], typer.Option(help="Mode MR - Permet d'ajouter un entête descriptif à la merge request")] = None,
-    task: Annotated[
-        Optional[List[str]], typer.Option(help="Mode MR - Permet d'ajouter des tâches réalisées à la description de merge request")
-    ] = None,
-    env: Annotated[
-        Optional[List[str]], typer.Option(help="Mode MR - Permet d'ajouter des environnements à la description de merge request")
-    ] = None,
-    test: Annotated[
-        Optional[List[str]], typer.Option(help="Mode MR - Permet d'ajouter des tests à la description de merge request")
-    ] = None,
+    task: Annotated[Optional[List[str]], typer.Option(help="Mode MR - Permet d'ajouter des tâches réalisées à la description de merge request")] = None,
+    env: Annotated[Optional[List[str]], typer.Option(help="Mode MR - Permet d'ajouter des environnements à la description de merge request")] = None,
+    test: Annotated[Optional[List[str]], typer.Option(help="Mode MR - Permet d'ajouter des tests à la description de merge request")] = None,
     notes: Annotated[Optional[str], typer.Option(help="Mode MR - Permet d'ajouter des notes à la merge request")] = None,
 ):
     """Fonction racine"""
@@ -80,7 +74,7 @@ def commit_code(commit_message: str, master: bool, branch: str, remote: str):
 
         result = subprocess.run(["git", "remote"], capture_output=True, text=True, check=True)
         if result.stdout.strip():
-            push = subprocess.run(["git push --all"], shell=True, check=True)
+            push = subprocess.run(["git push"], shell=True, check=True)
             if push.returncode == 0:
                 print("\n[bold green]:white_check_mark: Code compushed ![/bold green]")
             else:
