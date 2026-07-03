@@ -11,7 +11,11 @@ from rich import print
 from rich.prompt import Prompt
 from typing_extensions import Annotated
 
+# Create the typer application
+app = typer.Typer()
 
+
+@app.command()
 def main(
     commit_message: Annotated[
         str,
@@ -150,4 +154,4 @@ def generate_branch_name_ai(commit: str):
 
 
 if __name__ == "__main__":
-    typer.run(main)
+    app()

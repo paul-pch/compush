@@ -3,7 +3,7 @@ import re
 
 def get_ticket(string):
     # Expression régulière pour extraire la valeur entre parenthèses
-    pattern = r'\(([A-Z]+-\d+)\)'
+    pattern = r"\(([A-Z]+-\d+)\)"
 
     # Recherche de la correspondance
     match = re.search(pattern, string)
@@ -27,7 +27,7 @@ def extract_after_first_colon(string: str) -> str:
     print(result)  # Devrait afficher "Mise à jour du readme"
     """
     # Expression régulière pour extraire tout ce qui se trouve après le premier ':'
-    pattern = r':\s*(.*)'
+    pattern = r":\s*(.*)"
 
     # Recherche de la correspondance
     match = re.search(pattern, string)
