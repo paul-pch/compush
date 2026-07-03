@@ -1,8 +1,8 @@
-import subprocess
 import json
+import subprocess
 
 
-def get_project_id(api_token, project_name, keyword):
+def get_project_id(api_token: str, project_name: str, keyword: str):
     """Commande curl pour rechercher un projet"""
 
     curl_command = [

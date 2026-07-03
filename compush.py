@@ -1,5 +1,5 @@
 """Compush CLI"""
-#!/usr/bin/python3
+# !/usr/bin/python3
 
 import os
 import subprocess
@@ -8,7 +8,6 @@ from typing import List, Optional
 
 import typer
 from rich import print
-from rich.prompt import Prompt
 from typing_extensions import Annotated
 
 
@@ -80,10 +79,10 @@ def commit_code(commit_message: str, master: bool, branch: str, remote: str):
         print("[bold]:left_arrow_curving_right: Vérification de la branche ..[/bold]")
         current_branch = subprocess.getoutput("git rev-parse --abbrev-ref HEAD")
         if current_branch in ["master", "main"] and not master:
-            new_branch = branch
+            new_branch: str = branch
             if not branch:
                 print("[bold yellow]:warning: Master detected ![/bold yellow]")
-                new_branch = generate_branch_name_ai(commit_message)
+                new_branch = input("Saisissez le nom de la branche : ")
 
             print(f"\n[bold]:left_arrow_curving_right: Changement de branche: {new_branch} [/bold]")
             subprocess.run([f"git checkout -b {new_branch}"], shell=True, check=True)
