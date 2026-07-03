@@ -5,8 +5,13 @@ dist
 compush.spec
 notes
 
+# Virtual environments
+venv/
+.venv/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-*\$py.class
+*$py.class
 
+*.egg-info
