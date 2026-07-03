@@ -97,7 +97,7 @@ def main(
             sys.exit(1)
 
     # Git add
-    console.print("\n[bold]📦 Git add...[/bold]")
+    console.print("[bold]📦 Git add...[/bold]")
     success, error = run_git_command(["git", "add", "."])
     if not success:
         console.print(f"[bold red]Erreur git add: {error}[/bold red]")
@@ -118,7 +118,7 @@ def main(
         return
 
     # Git push
-    console.print("\n[bold]🚀 Git push...[/bold]")
+    console.print("[bold]🚀 Git push...[/bold]")
     success, error = run_git_command(["git", "push"])
 
     if not success:
