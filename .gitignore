@@ -1,22 +1,30 @@
-.vscode
-build
-dist
-
-compush.spec
-notes
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.pyc
+*.pyo
 
 # Virtual environments
 venv/
 .venv/
+env/
 
-# Cache files
+# Ruff cache
 .ruff_cache/
 
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+# UV
+uv.lock
 
-*.egg-info
-*\$py.class
-venv
+# IDE
+.vscode/
+.idea/
+.claude/
+
+# Notes personnelles
+notes

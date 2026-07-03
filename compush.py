@@ -1,152 +1,139 @@
-"""Compush CLI"""
-# !/usr/bin/python3
+#!/usr/bin/env python3
+"""Compush - Git add, commit et push automatisé avec gestion de branches"""
 
-import os
 import subprocess
 import sys
-from typing import List, Optional
+from typing import Optional
 
 import typer
-from rich import print
-from typing_extensions import Annotated
+from rich.console import Console
+from rich.prompt import Prompt
+
+app = typer.Typer()
+console = Console()
 
 
-def main(
-    commit_message: Annotated[
-        str,
-        typer.Argument(help="Message de commit à pusher avec les modifications en cours."),
-    ],
-    master: Annotated[Optional[bool], typer.Option(help="Permet de forcer le push sur master")] = False,
-    branch: Annotated[
-        Optional[str],
-        typer.Option(help="Permet de forcer un nom de branche git (seulement si l'actuelle est master ou main)"),
-    ] = None,
-    remote: Annotated[
-        Optional[str],
-        typer.Option(help="Permet de préciser un remote git déjà configuré"),
-    ] = "origin",
-    label: Annotated[
-        Optional[str],
-        typer.Option(help="Mode MR - Permet d'ajouter un label à la merge request"),
-    ] = None,
-    time_review: Annotated[
-        Optional[str],
-        typer.Option(help="Mode MR - Permet d'ajouter un temps de relecture à la merge request"),
-    ] = None,
-    description: Annotated[
-        Optional[str],
-        typer.Option(help="Mode MR - Permet d'ajouter un entête descriptif à la merge request"),
-    ] = None,
-    task: Annotated[
-        Optional[List[str]],
-        typer.Option(help="Mode MR - Permet d'ajouter des tâches réalisées à la description de merge request"),
-    ] = None,
-    env: Annotated[
-        Optional[List[str]],
-        typer.Option(help="Mode MR - Permet d'ajouter des environnements à la description de merge request"),
-    ] = None,
-    test: Annotated[
-        Optional[List[str]],
-        typer.Option(help="Mode MR - Permet d'ajouter des tests à la description de merge request"),
-    ] = None,
-    notes: Annotated[
-        Optional[str],
-        typer.Option(help="Mode MR - Permet d'ajouter des notes à la merge request"),
-    ] = None,
-):
-    """Fonction racine"""
-
-    # Commit code
-    commit_code(commit_message, master, branch, remote)
+def run_git_command(command: list[str]) -> tuple[bool, str]:
+    """Exécute une commande git et retourne (succès, output)"""
+    try:
+        result = subprocess.run(command, check=True, capture_output=True, text=True)
+        return True, result.stdout.strip()
+    except subprocess.CalledProcessError as e:
+        return False, e.stderr.strip()
 
 
-def commit_code(commit_message: str, master: bool, branch: str, remote: str):
-    """Méthode de commit et push du code courant"""
-
-    # Vérifie si des changements sont en attente
-    result = subprocess.run(
-        ["git status --porcelain=v1 | wc -l"],
-        shell=True,
-        capture_output=True,
-        check=False,
-    )
-    changements_git = int(result.stdout.decode().strip())
-    if changements_git == 0:
-        print("[bold green]:white_check_mark: Pas de changement détecté ![/bold green]")
-    else:
-        # Vérifie que la branche n'est pas 'master' ou 'main'
-        # Génère une branche en fonction du commit message et se positionne dessus
-        print("[bold]:left_arrow_curving_right: Vérification de la branche ..[/bold]")
-        current_branch = subprocess.getoutput("git rev-parse --abbrev-ref HEAD")
-        if current_branch in ["master", "main"] and not master:
-            new_branch: str = branch
-            if not branch:
-                print("[bold yellow]:warning: Master detected ![/bold yellow]")
-                new_branch = input("Saisissez le nom de la branche : ")
-
-            print(f"\n[bold]:left_arrow_curving_right: Changement de branche: {new_branch} [/bold]")
-            subprocess.run([f"git checkout -b {new_branch}"], shell=True, check=True)
-        elif branch and branch != current_branch:
-            subprocess.run([f"git checkout -b {branch}"], shell=True, check=True)
-
-        # Commit du code
-        print("\n[bold]:left_arrow_curving_right: Commit/push ..[/bold]")
-        subprocess.run(["git add ."], shell=True, check=True)
-        subprocess.run([f'git commit -m "{commit_message}"'], shell=True, check=True)
-
-        result = subprocess.run(["git", "remote"], capture_output=True, text=True, check=True)
-        if result.stdout.strip():
-            push = subprocess.run(["git push"], shell=True, check=True)
-            if push.returncode == 0:
-                print("\n[bold green]:white_check_mark: Code compushed ![/bold green]")
-            else:
-                print("\n[bold red]:building_construction: Erreur - Problème lors du push du code ... [/bold red]")
-                sys.exit(1)
-        else:
-            print("\n[bold yellow]:warning: :safety_vest: Aucun remote n'est configuré.[/bold yellow]")
+def get_current_branch() -> str:
+    """Retourne la branche courante"""
+    success, output = run_git_command(["git", "rev-parse", "--abbrev-ref", "HEAD"])
+    return output if success else ""
 
 
-def get_current_directory_name():
-    """Renvoie le nom du dossier courant"""
-    # Obtenir le chemin du répertoire courant
-    current_path = os.getcwd()
-    # Extraire le nom du dossier à partir du chemin
-    current_directory_name = os.path.basename(current_path)
-    return current_directory_name
+def generate_branch_name_ai(commit_message: str) -> str:
+    """
+    Génère un nom de branche.
 
+    TODO: Ajouter une logique automatisée (LLM, parsing du message, conventional commits, etc.)
+    Pour l'instant, prompt interactif simple.
 
-def get_default_branch():
-    """Renvoie le nom de la branche courante"""
-    branches = ["master", "main"]
-    for branch in branches:
-        result = subprocess.run(
-            ["git", "show-ref", "--verify", f"refs/heads/{branch}"],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if result.returncode == 0:
-            return branch
-    raise Exception(
-        "\n[bold yellow]:warning: Attention ! Aucune des branches 'master' ou 'main' n'existe. [/bold yellow]"
-    )
+    Args:
+        commit_message: Message de commit pour inspirer le nom de branche
 
-
-def generate_branch_name_ai(commit: str):
-    """Génère un nom de branche au travers de l'API Mistral AI"""
-
-    # directives = [
-    #     f"Génère moi un nom de branch en fonction du nom de commit suivant : {commit} .",
-    #     "Je veux que la branche respecte les normes de conventionnal commit",
-    #     "exemple: feat/ajout_fonctionnalite_simpleRenvoie moi uniquement le nom de la branche et rien d'autre.",
-    #     "Reformule légèrement pour une simplicité maximale, enlève les doublons et les connecteurs.",
-    #     "Pas d'accent ou caractères spéciaux. Pas de quote, rien que la branche en pure string.",
-    # ]
-
-    print("[bold yellow]:warning: Echec de l'appel à Mistral.[/bold yellow]\n")
-    branch_name = Prompt.ask("[bold blue]:right_arrow:  Entrez un nom de branche [/bold blue]")
+    Returns:
+        Le nom de la branche choisi par l'utilisateur
+    """
+    console.print(f"[cyan]Message de commit: {commit_message}[/cyan]")
+    branch_name = Prompt.ask("[bold yellow]Nom de la branche[/bold yellow]")
     return branch_name
 
 
+@app.command()
+def main(
+    commit_message: str = typer.Argument(..., help="Message de commit à pusher avec les modifications en cours"),
+    master: bool = typer.Option(False, "--master", help="Permet de forcer le push sur master/main"),
+    branch: Optional[str] = typer.Option(
+        None, "--branch", help="Permet de forcer un nom de branche (seulement si l'actuelle est master ou main)"
+    ),
+):
+    """Git add, commit et push en une commande avec gestion automatique des branches"""
+
+    # Vérifier s'il y a des changements
+    success, output = run_git_command(["git", "status", "--porcelain"])
+    if not success:
+        console.print("[bold red]Erreur lors de la vérification du statut git[/bold red]")
+        sys.exit(1)
+
+    if not output.strip():
+        console.print("[bold green]✅ Pas de changement détecté ![/bold green]")
+        return
+
+    # Vérifier la branche courante
+    console.print("[bold]🔍 Vérification de la branche...[/bold]")
+    current_branch = get_current_branch()
+
+    if not current_branch:
+        console.print("[bold red]Erreur: Impossible de déterminer la branche courante[/bold red]")
+        sys.exit(1)
+
+    console.print(f"[cyan]Branche courante: {current_branch}[/cyan]")
+
+    # Gestion des branches master/main
+    if current_branch in ["master", "main"] and not master:
+        new_branch = branch
+        if not branch:
+            console.print("[bold yellow]⚠️ Master détecté ![/bold yellow]")
+            new_branch = generate_branch_name_ai(commit_message)
+
+        console.print(f"\n[bold]🔀 Changement de branche: {new_branch}[/bold]")
+        success, error = run_git_command(["git", "checkout", "-b", new_branch])
+        if not success:
+            console.print(f"[bold red]Erreur lors de la création de la branche: {error}[/bold red]")
+            sys.exit(1)
+
+    elif branch and branch != current_branch:
+        console.print(f"\n[bold]🔀 Changement de branche: {branch}[/bold]")
+        success, error = run_git_command(["git", "checkout", "-b", branch])
+        if not success:
+            console.print(f"[bold red]Erreur lors de la création de la branche: {error}[/bold red]")
+            sys.exit(1)
+
+    # Git add
+    console.print("\n[bold]📦 Git add...[/bold]")
+    success, error = run_git_command(["git", "add", "."])
+    if not success:
+        console.print(f"[bold red]Erreur git add: {error}[/bold red]")
+        sys.exit(1)
+
+    # Git commit
+    console.print(f"[bold]💬 Git commit: {commit_message}[/bold]")
+    success, error = run_git_command(["git", "commit", "-m", commit_message])
+    if not success:
+        console.print(f"[bold red]Erreur git commit: {error}[/bold red]")
+        sys.exit(1)
+
+    # Vérifier si un remote existe
+    success, remotes = run_git_command(["git", "remote"])
+    if not success or not remotes.strip():
+        console.print("\n[bold yellow]⚠️ Aucun remote n'est configuré[/bold yellow]")
+        console.print("[bold green]✅ Code commité localement (pas de push)[/bold green]")
+        return
+
+    # Git push
+    console.print("\n[bold]🚀 Git push...[/bold]")
+    success, error = run_git_command(["git", "push"])
+
+    if not success:
+        # Tentative avec -u origin si la branche n'est pas trackée
+        console.print("[yellow]⚠️ Push échoué (branche non trackée)[/yellow]")
+        console.print("[yellow]💡 Essai avec -u origin...[/yellow]")
+        current_branch = get_current_branch()
+        success, error = run_git_command(["git", "push", "-u", "origin", current_branch])
+
+        if not success:
+            console.print(f"[bold red]🚨 Erreur - Problème lors du push du code: {error}[/bold red]")
+            sys.exit(1)
+
+    console.print("\n[bold green]✅ Code compushed ![/bold green]")
+
+
 if __name__ == "__main__":
-    typer.run(main)
+    app()

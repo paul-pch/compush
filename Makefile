@@ -1,23 +1,36 @@
-PYTHON := python3
-VENV_DIR := venv
-
-all: install integrate
-
-.PHONY: venv
-venv:
-	$(PYTHON) -m venv $(VENV_DIR)
-	@echo "Virtual environment created in $(VENV_DIR)"
-
-.PHONY: clean-venv
-clean-venv:
-	rm -rf $(VENV_DIR)
-
-.PHONY: upgrade
-upgrade:
-	./scripts/upgrade.sh requirements.txt
+.PHONY: install reinstall uninstall dev lint format clean
 
 install:
-	pyinstaller --onefile compush.py
+	@echo "📦 Installation de compush avec uv..."
+	uv tool install .
+	@echo "✅ compush installé ! Utilisez: compush \"votre message\""
 
-integrate:
-	grep -q '$(CURDIR)' ~/.zshrc || echo 'export PATH=$(CURDIR)/dist:$$PATH' >> ~/.zshrc
+reinstall:
+	@echo "🔄 Réinstallation de compush..."
+	uv tool install --reinstall .
+	@echo "✅ compush réinstallé !"
+
+uninstall:
+	@echo "🗑️ Désinstallation de compush..."
+	uv tool uninstall compush
+	@echo "✅ compush désinstallé"
+
+dev:
+	@echo "🔧 Installation en mode développement..."
+	uv sync
+	@echo "✅ Environnement de développement prêt !"
+	@echo "💡 Utilisez: uv run compush \"votre message\""
+
+lint:
+	@echo "🔍 Vérification du code avec ruff..."
+	uv run ruff check .
+
+format:
+	@echo "🎨 Formatage du code avec ruff..."
+	uv run ruff check --fix .
+	uv run ruff format .
+
+clean:
+	@echo "🧹 Nettoyage des fichiers temporaires..."
+	rm -rf .ruff_cache __pycache__ .venv uv.lock
+	@echo "✅ Nettoyage terminé"
